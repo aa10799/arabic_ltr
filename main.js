@@ -387,34 +387,39 @@ timeline.push(startExperiment);
     choices: ['a', 'l'],
     trial_duration: 5000, // Allow a maximum of 5 seconds for response
     data: {
-            task: 'response',
-            color: 'black',
-            position: jsPsych.timelineVariable('Position'),
-            target: jsPsych.timelineVariable('Target'),
-            probe: jsPsych.timelineVariable('Probe'),
-            correct_response: jsPsych.timelineVariable('Target'),
-            target_position: jsPsych.timelineVariable('Target_Position'),
-            probe_position: jsPsych.timelineVariable('Probe_Position'),
-            target_freq: jsPsych.timelineVariable('Target_Occurrences'),
-            probe_freq:  jsPsych.timelineVariable('Probe_Occurrences'),
-            target_root: jsPsych.timelineVariable('Target_Root'),
-            probe_root: jsPsych.timelineVariable('Probe_Root'),
-            target_rootfreq:jsPsych.timelineVariable('Target_RootFreq'),
-            probet_rootfreq:jsPsych.timelineVariable('Probe_RootFreq'),
-            target_gloss:jsPsych.timelineVariable('Target_Gloss'),
-            probe_gloss: jsPsych.timelineVariable('Probe_Gloss')
-    
+        task: 'response',
+        color: 'black',
+        rt: undefined, // Initialize rt property
+        position: jsPsych.timelineVariable('Position'),
+        target: jsPsych.timelineVariable('Target'),
+        probe: jsPsych.timelineVariable('Probe'),
+        correct_response: jsPsych.timelineVariable('Target'),
+        target_position: jsPsych.timelineVariable('Target_Position'),
+        probe_position: jsPsych.timelineVariable('Probe_Position'),
+        target_freq: jsPsych.timelineVariable('Target_Occurrences'),
+        probe_freq:  jsPsych.timelineVariable('Probe_Occurrences'),
+        target_root: jsPsych.timelineVariable('Target_Root'),
+        probe_root: jsPsych.timelineVariable('Probe_Root'),
+        target_rootfreq: jsPsych.timelineVariable('Target_RootFreq'),
+        probe_rootfreq: jsPsych.timelineVariable('Probe_RootFreq'),
+        target_gloss: jsPsych.timelineVariable('Target_Gloss'),
+        probe_gloss: jsPsych.timelineVariable('Probe_Gloss')
+    },
+    on_start: function (trial) {
+        trial.record_trial_start = true; // Record trial start time
     },
     on_finish: function (data) {
-        var targetPosition = data.target_position;
-        var responseKey = data.response;
+        // Calculate response time
+        var endTime = performance.now();
+        var startTime = data.trial_start; // Get the trial start time
+
+        data.rt = endTime - startTime;
 
         // Check if the participant's response key matches the target position
-        data.correct = (targetPosition === 'Left' && responseKey === 'a') ||
-                       (targetPosition === 'Right' && responseKey === 'l');
+        data.correct = (data.target_position === 'Left' && data.response === 'a') ||
+                       (data.target_position === 'Right' && data.response === 'l');
     },
 };
-    
 var feedback = {
   type: jsPsychHtmlKeyboardResponse,
   trial_duration: 1000,
@@ -629,7 +634,7 @@ var endMessage = {
 // Define the full timeline
 var experimentTimeline = [
     pavlovia_init,
-    enter_fullscreen,
+enter_fullscreen,
 trial,
 welcome,
 demographics,
